@@ -15,4 +15,4 @@ This project intends to implement a Gomoku game in Haskell using the Brick libra
 6. After placing a piece or rotating, calculate whether one player has won.
 
 
-![How the rotate works](https://github.com/lzhfromustc/cse230/doc/RotateGomoku.webp)
+![How the rotate works](https://github.com/lzhfromustc/cse230/blob/main/doc/RotateGomoku.webp)
