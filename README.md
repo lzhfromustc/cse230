@@ -1,5 +1,12 @@
 *Group members*: Nitya Davarapalli (ndavarapalli@ucsd.edu), Ziheng Liu (zil060@ucsd.edu)
 
+Running this game on the terminal interface:
+1. git clone this repo to your local machine.
+2. cd cse230
+3. cabal build
+4. cabal run gomoku
+
+
 **Milestone 2**
 (This section will be moved below other sections later.)
 
