@@ -89,7 +89,6 @@ handleEvent game (VtyEvent (V.EvKey key [])) =
     V.KChar 'S' -> moveCursor South 3 game
     V.KChar 'A' -> moveCursor West 3 game
     V.KChar 'D' -> moveCursor East 3 game
-    V.KChar 'x' -> eraseCell . snapshotGame $ game
     -- Enter number
     V.KChar '0' -> answerCell 0 . snapshotGame $ game
     V.KChar '1' -> answerCell 1 . snapshotGame $ game
@@ -206,8 +205,8 @@ main :: IO ()
 main = do
   putStr $ unlines
     [ "GOMOKU"
-    , "  1) Load demo game"
-    , "  *) Quit"
+    , "  1: Enter 1 to play GOMOKU! "
+    , "  Otherwise: Press any character to quit the demo"
     ]
   response <- prompt "> "
   case head' response of
