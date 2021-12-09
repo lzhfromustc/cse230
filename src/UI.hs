@@ -155,6 +155,21 @@ drawHelp =
   & withBorderStyle unicodeBold
   & setAvailableSize (31, 12)
 
+drawDebug :: Game -> Widget ()
+drawDebug game =
+  [ "cursor:    (" <> show x <> ", " <> show y <> ")"
+  -- , "progress:  " <> show (gameProgress game) <> "%"
+  , "solved:    " <> show (gameSolved game)
+  ]
+  & unlines
+  & str
+  & padRight Max
+  & padLeftRight 1
+  & borderWithLabel (str " Debug ")
+  & withBorderStyle unicodeBold
+  & hLimit 31
+  where (x, y) = cursor game
+
 drawSolved :: Game -> Widget ()
 drawSolved game
   | completed && solved =
@@ -174,7 +189,8 @@ drawSolved game
 drawUI :: Game -> Widget ()
 drawUI game =
   drawGrid game <+> ( drawHelp
-                <=>   drawSolved game
+                <=>   drawDebug game
+                -- <=>   drawSolved game
                     )
 
 app :: App Game e ()
