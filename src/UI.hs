@@ -23,8 +23,8 @@ import Game
 
 import Brick
 import Brick.Widgets.Border (border, borderWithLabel, hBorderWithLabel, vBorder)
-import Brick.Widgets.Border.Style (unicode, unicodeBold)
-import Brick.Widgets.Center (center)
+import Brick.Widgets.Border.Style (unicode, unicodeBold, unicodeRounded)
+import Brick.Widgets.Center (center, centerLayer)
 import Data.List (intersperse)
 import Data.List.Split (chunksOf)
 import qualified Graphics.Vty as V
@@ -64,13 +64,13 @@ handleEvent game (VtyEvent (V.EvKey key [V.MCtrl])) =
     V.KChar 'r' -> continue . snapshotGame . resetGame $ game
     -- Other
     _           -> continue game
-handleEvent game (VtyEvent (V.EvKey key [V.MShift])) =
-  continue $ case key of
-    V.KUp    -> moveCursor North 3 game
-    V.KDown  -> moveCursor South 3 game
-    V.KLeft  -> moveCursor West 3 game
-    V.KRight -> moveCursor East 3 game
-    _        -> game
+-- handleEvent game (VtyEvent (V.EvKey key [V.MShift])) =
+--   continue $ case key of
+--     V.KUp    -> moveCursor North 3 game
+--     V.KDown  -> moveCursor South 3 game
+--     V.KLeft  -> moveCursor West 3 game
+--     V.KRight -> moveCursor East 3 game
+--     _        -> game
 handleEvent game (VtyEvent (V.EvKey key [])) =
   continue $ case key of
     -- Move by cell
@@ -78,26 +78,26 @@ handleEvent game (VtyEvent (V.EvKey key [])) =
     V.KDown     -> moveCursor South 1 game
     V.KLeft     -> moveCursor West 1 game
     V.KRight    -> moveCursor East 1 game
-    V.KChar 'k' -> moveCursor North 1 game
-    V.KChar 'j' -> moveCursor South 1 game
-    V.KChar 'h' -> moveCursor West 1 game
-    V.KChar 'l' -> moveCursor East 1 game
+    -- V.KChar 'k' -> moveCursor North 1 game
+    -- V.KChar 'j' -> moveCursor South 1 game
+    -- V.KChar 'h' -> moveCursor West 1 game
+    -- V.KChar 'l' -> moveCursor East 1 game
     V.KChar 'w' -> moveCursor North 1 game
     V.KChar 's' -> moveCursor South 1 game
     V.KChar 'a' -> moveCursor West 1 game
     V.KChar 'd' -> moveCursor East 1 game
     -- Move by region
-    V.KChar 'K' -> moveCursor North 3 game
-    V.KChar 'J' -> moveCursor South 3 game
-    V.KChar 'H' -> moveCursor West 3 game
-    V.KChar 'L' -> moveCursor East 3 game
-    V.KChar 'W' -> moveCursor North 3 game
-    V.KChar 'S' -> moveCursor South 3 game
-    V.KChar 'A' -> moveCursor West 3 game
-    V.KChar 'D' -> moveCursor East 3 game
+    -- V.KChar 'K' -> moveCursor North 3 game
+    -- V.KChar 'J' -> moveCursor South 3 game
+    -- V.KChar 'H' -> moveCursor West 3 game
+    -- V.KChar 'L' -> moveCursor East 3 game
+    -- V.KChar 'W' -> moveCursor North 3 game
+    -- V.KChar 'S' -> moveCursor South 3 game
+    -- V.KChar 'A' -> moveCursor West 3 game
+    -- V.KChar 'D' -> moveCursor East 3 game
     -- Enter number
-    V.KChar '0' -> answerCell 0 . snapshotGame $ game
-    V.KChar '1' -> answerCell 1 . snapshotGame $ game
+    V.KChar ' ' -> answerCell (player game) . snapshotGame $ game
+    -- V.KChar '1' -> answerCell (player game) . snapshotGame $ game
     -- Other
     _           -> game
 handleEvent game _ = continue game
@@ -117,19 +117,11 @@ highlightCursor game widgets =
 
 drawCell :: Cell -> Widget ()
 drawCell cell = center $ case cell of
-  Given x -> withAttr styleCellGiven . str $ show x
--- if 0 or 1   
-  Input 0 -> withAttr styleCellWhite . str $ show 0
-  Input 1 -> withAttr styleCellBlack . str $ show 1
-  Input x -> withAttr styleCellInput . str $ show x
-  Note xs -> fmap str xs'
-          & chunksOf 3
-          & fmap hBox
-          & vBox
-          & withAttr styleCellNote
-    where xs' = fmap f [1..9]
-          f x = if x `elem` xs then show x else " "
+-- white for player 0, and black for player 1 
+  Input 0 -> withAttr styleCellWhite . str $ "⬤"       -- " ◍\n◍ ◍ ◍\n ◍"
+  Input 1 -> withAttr styleCellBlack . str $ "⬤"
   Empty   -> str " "
+  _       -> undefined
 
 drawGrid :: Game -> Widget ()
 drawGrid game =
@@ -139,7 +131,7 @@ drawGrid game =
   & highlightCursor game
   & fmap (fmap (fmap (intersperse (withBorderStyle unicode vBorder))))
   & fmap (fmap (fmap hBox))
-  & fmap (fmap (intersperse (withBorderStyle unicode (hBorderWithLabel (str "┼───────┼")))))
+  & fmap (fmap (intersperse (withBorderStyle unicode (hBorderWithLabel (str "─┼───────┼─")))))
   & fmap (fmap vBox)
   & fmap (intersperse (withBorderStyle unicodeBold vBorder))
   & fmap hBox
@@ -152,9 +144,11 @@ drawGrid game =
 
 drawHelp :: Widget ()
 drawHelp =
-  [ "move:    ←↓↑→ / wasd / hjkl"
-  , "reset:   ctrl + r"
-  , "quit:    ctrl + c"
+  [ "Move Cursor:    ←↓↑→ / wasd"
+  , "Place a piece:   `Space`"
+  , ""
+  , "Rest Game:   ctrl + r"
+  , "Quit Game:    ctrl + c"
   ]
   & unlines
   & str
@@ -165,9 +159,9 @@ drawHelp =
 
 drawDebug :: Game -> Widget ()
 drawDebug game =
-  [ "cursor:    (" <> show x <> ", " <> show y <> ")"
-  -- , "progress:  " <> show (gameProgress game) <> "%"
-  , "solved:    " <> show (gameSolved game)
+  [ "Cursor:    (" <> show x <> ", " <> show y <> ")"
+  , "Current Player:  " <> show (player game)
+  , "Have a winner:    " <> show (gameSolved game)
   ]
   & unlines
   & str
@@ -194,8 +188,20 @@ drawSolved game
       . border
       . center
 
-drawUI :: Game -> Widget ()
+drawUI :: Game -> [Widget ()]
 drawUI game =
+  if (gameSolved game) 
+    then [ centerLayer $
+      (withBorderStyle unicodeBold
+      . withBorderStyle unicodeRounded
+      . borderWithLabel (str " Winner ")
+      . border) $ str ("\n\n          Player" <> (show winner) <> " wins!          \n\n")
+    , drawUIMain game]
+    else [drawUIMain game]
+    where winner = if (player game) == 0 then 1 else 0
+
+drawUIMain :: Game -> Widget ()
+drawUIMain game =
   drawGrid game <+> ( drawHelp
                 <=>   drawDebug game
                 -- <=>   drawSolved game
@@ -203,7 +209,7 @@ drawUI game =
 
 app :: App Game e ()
 app = App
-  { appDraw         = \x -> [drawUI x]
+  { appDraw         = \x -> (drawUI x)
   , appChooseCursor = neverShowCursor
   , appHandleEvent  = handleEvent
   , appStartEvent   = pure

@@ -21,7 +21,7 @@ module Game
 import Data.Function ((&))
 import Data.List (isInfixOf)
 import Data.List.Split (chunksOf)
-import Lens.Micro (ix, (%~))
+import Lens.Micro (ix, (%~), (^?))
 
 data Cell
   = Given Int
@@ -36,6 +36,7 @@ type Grid = [Row]
 
 data Game = Game
   { cursor :: (Int, Int)
+  , player :: Int
   , grid :: Grid
   , previous :: Maybe Game
   } deriving (Read, Show)
@@ -50,6 +51,7 @@ data Direction
 mkGame :: [Int] -> Game
 mkGame xs = Game
   { cursor = (4, 4)
+  , player = 0
   , grid = chunksOf 9 $ mkCell <$> xs
   , previous = Nothing
   }
@@ -70,15 +72,32 @@ moveCursor direction distance game =
       | n < 0     = n + 9
       | otherwise = n
 
+switchPlayer :: Game -> Game
+switchPlayer game =
+  game { player = if previousPlayer == 0 then 1 else 0}
+  where previousPlayer = player game
+
+maySwitchPlayer :: Game -> Game
+maySwitchPlayer game = case cell of
+  Just (Input _ ) -> game
+  Just (Empty   ) -> switchPlayer game
+  _               -> undefined
+  where 
+    cell = grid game ^? ix y . ix x
+    (x, y) = cursor game
+
+
 -- TODO: Remove need for lenses
 transformCell :: (Cell -> Cell) -> Game -> Game
 transformCell f game = game { grid = grid game & ix y . ix x %~ f }
   where (x, y) = cursor game
 
+
 answerCell :: Int -> Game -> Game
-answerCell number = transformCell $ \case
-  Given n -> Given n
-  _       -> Input number
+answerCell number game = transformCell (\case
+  Input n -> Input n
+  Empty   -> Input number
+  _       -> undefined) (maySwitchPlayer game)
 
 -- toggleNoteCell :: Int -> Game -> Game
 -- toggleNoteCell number = transformCell $ \case
@@ -102,7 +121,7 @@ snapshotGame game
         lastGrid    = grid <$> previous game
 
 resetGame :: Game -> Game
-resetGame game = game { grid = fmap (fmap f) (grid game) }
+resetGame game = game { grid = fmap (fmap f) (grid game), player = 0 }
   where f = \case
           Given n -> Given n
           _       -> Empty
