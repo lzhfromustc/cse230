@@ -31,10 +31,13 @@ import qualified Graphics.Vty as V
 import Lens.Micro
 
 styleCursor, styleCellGiven, styleCellInput, styleCellNote :: AttrName
+styleCellWhite, styleCellBlack :: AttrName
 styleSolved, styleUnsolved :: AttrName
 styleCursor    = attrName "styleCursor"
 styleCellGiven = attrName "styleCellGiven"
 styleCellInput = attrName "styleCellInput"
+styleCellWhite = attrName "styleCellWhite"
+styleCellBlack = attrName "styleCellBlack"
 styleCellNote  = attrName "styleCellNote"
 styleSolved    = attrName "styleSolved"
 styleUnsolved  = attrName "styleUnsolved"
@@ -44,6 +47,8 @@ attributes = attrMap V.defAttr
   [ (styleCursor    , bg V.brightBlack)
   , (styleCellGiven , V.defAttr)
   , (styleCellInput , fg V.blue)
+  , (styleCellWhite , fg V.white)
+  , (styleCellBlack , fg V.black)
   , (styleCellNote  , fg V.yellow)
   , (styleSolved    , fg V.green)
   , (styleUnsolved  , fg V.red)
@@ -112,7 +117,9 @@ highlightCursor game widgets =
 drawCell :: Cell -> Widget ()
 drawCell cell = center $ case cell of
   Given x -> withAttr styleCellGiven . str $ show x
-  Input x  -> withAttr styleCellInput . str $ show x
+  Input 0 -> withAttr styleCellWhite . str $ show 0
+  Input 1 -> withAttr styleCellBlack . str $ show 1
+  Input x -> withAttr styleCellInput . str $ show x
   Note xs -> fmap str xs'
           & chunksOf 3
           & fmap hBox
