@@ -36,6 +36,7 @@ styleSolved, styleUnsolved :: AttrName
 styleCursor    = attrName "styleCursor"
 styleCellGiven = attrName "styleCellGiven"
 styleCellInput = attrName "styleCellInput"
+-- define color attributes for white and black 
 styleCellWhite = attrName "styleCellWhite"
 styleCellBlack = attrName "styleCellBlack"
 styleCellNote  = attrName "styleCellNote"
@@ -117,6 +118,7 @@ highlightCursor game widgets =
 drawCell :: Cell -> Widget ()
 drawCell cell = center $ case cell of
   Given x -> withAttr styleCellGiven . str $ show x
+-- if 0 or 1   
   Input 0 -> withAttr styleCellWhite . str $ show 0
   Input 1 -> withAttr styleCellBlack . str $ show 1
   Input x -> withAttr styleCellInput . str $ show x
