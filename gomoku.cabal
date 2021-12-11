@@ -54,7 +54,7 @@ executable gomoku
                      , microlens
                      , split
                      , vty
-                     , hspec
+                    --  , hspec
 
 test-suite tests
   hs-source-dirs:      test
@@ -65,5 +65,5 @@ test-suite tests
   build-depends:       base >= 4.7 && < 5
                      , game
                      , random
-                     , hspec
+                    --  , hspec
                      
