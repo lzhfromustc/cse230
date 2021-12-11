@@ -166,7 +166,7 @@ drawUI game =
 drawUIMain :: Game -> Widget ()
 drawUIMain game =
   drawGrid game <+> ( drawHelp
-                <=>   drawDebug game
+                -- <=>   drawDebug game
                     )
 
 app :: App Game e ()
