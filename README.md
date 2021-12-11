@@ -1,6 +1,6 @@
 **Gomoku**
 
-This project intends to implement a Gomoku Terminal User Interface game in Haskell using the Brick library. There will be two players in this game, sharing the same computer (no network). In each round, a player can choose a spot on the board to place the piece, or rotate 1/4 of the board. If the new piece or the rotation creates a consecutive line of 5+ pieces in a row/column/diagonal, their owner wins. 
+This project implements a Gomoku Terminal User Interface game in Haskell using the Brick library. This is a two player game, with two users sharing the same computer (no network). The game starts when the first player moves the cursor in order to choose a spot on the board to place the piece. Places can be pieced on the board using the spacebar. Players alternate turns and place white and black pieces on the board until one player wins. If the new piece that is placed creates a consecutive line of 5+ pieces in a row/column/diagonal, the corresponding player wins. Each player is allowed one move per round. Calculation of a possible winner happens after every turn, when a player places a piece.
 
 **Playing Gomoku**
 
@@ -49,21 +49,5 @@ As the change of plan, the following will be implemented if we have time.
 (1) allow the user to decide the size of board and winning condition; 
 (2) allow the rotation of 1/4 of the board; 
 (3) a very simple AI opponent who can block your pieces if you have 3 pieces in line.
-
-
-
-
-
-
-**Goals**
-1. Display a 2N * 2N board with N input by user.
-2. Move the cursor on the board by keyboard input.
-3. Place a piece by keyboard input, with black or white color alternately.
-4. Choose and rotate 1/4 of the board by keyboard input.
-5. Only allow one movement for one player per round.
-6. After placing a piece or rotating, calculate whether one player has won.
-
-
-![How the rotate works](https://github.com/lzhfromustc/cse230/blob/main/doc/RotateGomoku.webp)
 
 *Group members*: Nitya Davarapalli (ndavarapalli@ucsd.edu), Ziheng Liu (zil060@ucsd.edu)
