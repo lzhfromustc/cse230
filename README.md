@@ -39,15 +39,4 @@ We have `moveCursor`, `placePiece`, `illegalPlace`, and `closeMsg` functions to 
 
 There are some constants used, including the size of the board and how many pieces needed to win. We may allow the user to input them if we have time.
 
-4. TODO:
-
-We need to learn how the event is handled, how the cursor is implemented, and many other stuff.
-
-We also need to learn how to build a program with cabal.
-
-As the change of plan, the following will be implemented if we have time.
-(1) allow the user to decide the size of board and winning condition; 
-(2) allow the rotation of 1/4 of the board; 
-(3) a very simple AI opponent who can block your pieces if you have 3 pieces in line.
-
 *Group members*: Nitya Davarapalli (ndavarapalli@ucsd.edu), Ziheng Liu (zil060@ucsd.edu)
