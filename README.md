@@ -1,4 +1,8 @@
-*Group members*: Nitya Davarapalli (ndavarapalli@ucsd.edu), Ziheng Liu (zil060@ucsd.edu)
+**Gomoku**
+
+This project intends to implement a Gomoku Terminal User Interface game in Haskell using the Brick library. There will be two players in this game, sharing the same computer (no network). In each round, a player can choose a spot on the board to place the piece, or rotate 1/4 of the board. If the new piece or the rotation creates a consecutive line of 5+ pieces in a row/column/diagonal, their owner wins. 
+
+**Playing Gomoku**
 
 Running this game on the terminal interface:
 1. git clone this repo to your local machine.
@@ -8,7 +12,6 @@ Running this game on the terminal interface:
 
 
 **Milestone 2**
-(This section will be moved below other sections later.)
 
 We are still learning how to use Brick from its Guide, its demo programs, and some projects built on it.
 
@@ -49,11 +52,8 @@ As the change of plan, the following will be implemented if we have time.
 
 
 
-**Introduction**
 
-This project intends to implement a Gomoku game in Haskell using the Brick library. There will be two players in this game, sharing the same computer (no network). In each round, a player can choose a spot on the board to place the piece, or rotate 1/4 of the board. If the new piece or the rotation creates a consecutive line of 5+ pieces in a row/column/diagonal, their owner wins. 
 
-*Note*: To the best of our knowledge, this game has not been implemented in Brick before. Moreover, we have the rotating mechanism added to traditional Gomoku.
 
 **Goals**
 1. Display a 2N * 2N board with N input by user.
@@ -65,3 +65,5 @@ This project intends to implement a Gomoku game in Haskell using the Brick libra
 
 
 ![How the rotate works](https://github.com/lzhfromustc/cse230/blob/main/doc/RotateGomoku.webp)
+
+*Group members*: Nitya Davarapalli (ndavarapalli@ucsd.edu), Ziheng Liu (zil060@ucsd.edu)
