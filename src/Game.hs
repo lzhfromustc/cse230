@@ -9,19 +9,19 @@ module Game
   , mkGame
   , moveCursor
   , answerCell
-  -- , toggleNoteCell
-  -- , eraseCell
   , snapshotGame
   , resetGame
   , gameProgress
   , gameSolved
   , getRegion
+    
   ) where
 
 import Data.Function ((&))
 import Data.List (isInfixOf)
 import Data.List.Split (chunksOf)
 import Lens.Micro (ix, (%~), (^?))
+
 
 data Cell
   = Given Int
@@ -98,20 +98,6 @@ answerCell number game = transformCell (\case
   Input n -> Input n
   Empty   -> Input number
   _       -> undefined) (maySwitchPlayer game)
-
--- toggleNoteCell :: Int -> Game -> Game
--- toggleNoteCell number = transformCell $ \case
---   Given n -> Given n
---   Note ns
---     | ns == [number]   -> Empty
---     | number `elem` ns -> Note (filter (/= number) ns)
---     | otherwise        -> Note (number : ns)
---   _       -> Note [number]
-
--- eraseCell :: Game -> Game
--- eraseCell = transformCell $ \case
---   Given n -> Given n
---   _       -> Empty
 
 snapshotGame :: Game -> Game
 snapshotGame game

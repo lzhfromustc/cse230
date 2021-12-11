@@ -1,21 +1,3 @@
--- -- Learnt from the Snake game
-
--- -- Types
-
--- -- Named resources. Not used in the Snake game, but our game may need it if we want to know where is the gamer focused on. 
---     -- We may also not use it, if we can implement cursor without it.
--- type Name = ()
-
--- data Cell = Piece | Empty -- The Piece here is probably not the Piece we defined in Main.hs?
-
--- app :: App Game Unknown Name -- I don't think our game is driven by event Tick in Snake game
--- app = App { appDraw = drawUI
---           , appChooseCursor = showCursor?
---           , appHandleEvent = handleEvent
---           , appStartEvent = return
---           , appAttrMap = const theMap?
---           }
-
 module UI where
 
 import FileIO
@@ -31,14 +13,14 @@ import qualified Graphics.Vty as V
 import Lens.Micro
 
 styleCursor, styleCellGiven, styleCellInput, styleCellNote :: AttrName
-styleCellWhite, styleCellBlack :: AttrName
+styleWhite, styleBlack :: AttrName
 styleSolved, styleUnsolved :: AttrName
 styleCursor    = attrName "styleCursor"
 styleCellGiven = attrName "styleCellGiven"
 styleCellInput = attrName "styleCellInput"
 -- define color attributes for white and black 
-styleCellWhite = attrName "styleCellWhite"
-styleCellBlack = attrName "styleCellBlack"
+styleWhite = attrName "styleWhite"
+styleBlack = attrName "styleBlack"
 styleCellNote  = attrName "styleCellNote"
 styleSolved    = attrName "styleSolved"
 styleUnsolved  = attrName "styleUnsolved"
@@ -48,8 +30,8 @@ attributes = attrMap V.defAttr
   [ (styleCursor    , bg V.brightBlack)
   , (styleCellGiven , V.defAttr)
   , (styleCellInput , fg V.blue)
-  , (styleCellWhite , fg V.white)
-  , (styleCellBlack , fg V.black)
+  , (styleWhite , fg V.white)
+  , (styleBlack , fg V.black)
   , (styleCellNote  , fg V.yellow)
   , (styleSolved    , fg V.green)
   , (styleUnsolved  , fg V.red)
@@ -64,13 +46,6 @@ handleEvent game (VtyEvent (V.EvKey key [V.MCtrl])) =
     V.KChar 'r' -> continue . snapshotGame . resetGame $ game
     -- Other
     _           -> continue game
--- handleEvent game (VtyEvent (V.EvKey key [V.MShift])) =
---   continue $ case key of
---     V.KUp    -> moveCursor North 3 game
---     V.KDown  -> moveCursor South 3 game
---     V.KLeft  -> moveCursor West 3 game
---     V.KRight -> moveCursor East 3 game
---     _        -> game
 handleEvent game (VtyEvent (V.EvKey key [])) =
   continue $ case key of
     -- Move by cell
@@ -78,26 +53,14 @@ handleEvent game (VtyEvent (V.EvKey key [])) =
     V.KDown     -> moveCursor South 1 game
     V.KLeft     -> moveCursor West 1 game
     V.KRight    -> moveCursor East 1 game
-    -- V.KChar 'k' -> moveCursor North 1 game
-    -- V.KChar 'j' -> moveCursor South 1 game
-    -- V.KChar 'h' -> moveCursor West 1 game
-    -- V.KChar 'l' -> moveCursor East 1 game
+
     V.KChar 'w' -> moveCursor North 1 game
     V.KChar 's' -> moveCursor South 1 game
     V.KChar 'a' -> moveCursor West 1 game
     V.KChar 'd' -> moveCursor East 1 game
-    -- Move by region
-    -- V.KChar 'K' -> moveCursor North 3 game
-    -- V.KChar 'J' -> moveCursor South 3 game
-    -- V.KChar 'H' -> moveCursor West 3 game
-    -- V.KChar 'L' -> moveCursor East 3 game
-    -- V.KChar 'W' -> moveCursor North 3 game
-    -- V.KChar 'S' -> moveCursor South 3 game
-    -- V.KChar 'A' -> moveCursor West 3 game
-    -- V.KChar 'D' -> moveCursor East 3 game
+    
     -- Enter number
     V.KChar ' ' -> answerCell (player game) . snapshotGame $ game
-    -- V.KChar '1' -> answerCell (player game) . snapshotGame $ game
     -- Other
     _           -> game
 handleEvent game _ = continue game
@@ -118,8 +81,8 @@ highlightCursor game widgets =
 drawCell :: Cell -> Widget ()
 drawCell cell = center $ case cell of
 -- white for player 0, and black for player 1 
-  Input 0 -> withAttr styleCellWhite . str $ "⬤"       -- " ◍\n◍ ◍ ◍\n ◍"
-  Input 1 -> withAttr styleCellBlack . str $ "⬤"
+  Input 0 -> withAttr styleWhite . str $ "⬤"       -- " ◍\n◍ ◍ ◍\n ◍"
+  Input 1 -> withAttr styleBlack . str $ "⬤"
   Empty   -> str " "
   _       -> undefined
 
@@ -195,7 +158,7 @@ drawUI game =
       (withBorderStyle unicodeBold
       . withBorderStyle unicodeRounded
       . borderWithLabel (str " Winner ")
-      . border) $ str ("\n\n          Player" <> (show winner) <> " wins!          \n\n")
+      . border) $ str ("\n\n          Player " <> (show winner) <> " wins!          \n\n")
     , drawUIMain game]
     else [drawUIMain game]
     where winner = if (player game) == 0 then 1 else 0
@@ -204,7 +167,6 @@ drawUIMain :: Game -> Widget ()
 drawUIMain game =
   drawGrid game <+> ( drawHelp
                 <=>   drawDebug game
-                -- <=>   drawSolved game
                     )
 
 app :: App Game e ()
