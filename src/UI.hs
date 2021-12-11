@@ -1,8 +1,6 @@
 module UI where
 
-import FileIO
 import Game
-
 import Brick
 import Brick.Widgets.Border (border, borderWithLabel, hBorderWithLabel, vBorder)
 import Brick.Widgets.Border.Style (unicode, unicodeBold, unicodeRounded)
@@ -38,31 +36,31 @@ attributes = attrMap V.defAttr
   ]
 
 handleEvent :: Game -> BrickEvent () e -> EventM () (Next Game)
-handleEvent game (VtyEvent (V.EvKey key [V.MCtrl])) =
-  case key of
-    -- Quit
-    V.KChar 'c' -> halt game
-    -- Reset
-    V.KChar 'r' -> continue . snapshotGame . resetGame $ game
-    -- Other
-    _           -> continue game
 handleEvent game (VtyEvent (V.EvKey key [])) =
-  continue $ case key of
-    -- Move by cell
-    V.KUp       -> moveCursor North 1 game
-    V.KDown     -> moveCursor South 1 game
-    V.KLeft     -> moveCursor West 1 game
-    V.KRight    -> moveCursor East 1 game
+  case key of
+    -- Move cursor
+    V.KUp       -> continue $ moveCursor North 1 game
+    V.KDown     -> continue $ moveCursor South 1 game
+    V.KLeft     -> continue $ moveCursor West 1 game
+    V.KRight    -> continue $ moveCursor East 1 game
 
-    V.KChar 'w' -> moveCursor North 1 game
-    V.KChar 's' -> moveCursor South 1 game
-    V.KChar 'a' -> moveCursor West 1 game
-    V.KChar 'd' -> moveCursor East 1 game
+    V.KChar 'w' -> continue $ moveCursor North 1 game
+    V.KChar 's' -> continue $ moveCursor South 1 game
+    V.KChar 'a' -> continue $ moveCursor West 1 game
+    V.KChar 'd' -> continue $ moveCursor East 1 game
+
+
     
-    -- Enter number
-    V.KChar ' ' -> answerCell (player game) . snapshotGame $ game
-    -- Other
-    _           -> game
+    -- Place a piece and do all the checking
+    V.KChar ' ' -> continue $ if (end game) then game else answerCell (player game) . snapshotGame $ game
+
+    -- Reset or End game
+    V.KChar 'c' -> halt game
+    V.KChar 'r' -> continue . snapshotGame . resetGame $ game
+
+    -- Other: continue
+    _           -> continue $ game
+
 handleEvent game _ = continue game
 
 highlightCursor :: Game -> [[[[Widget ()]]]] -> [[[[Widget ()]]]]
@@ -105,13 +103,16 @@ drawGrid game =
   & setAvailableSize (73, 37)
   & padRight (Pad 1)
 
-drawHelp :: Widget ()
-drawHelp =
-  [ "Move Cursor:    ←↓↑→ / wasd"
-  , "Place a piece:   `Space`"
+drawHelp :: Game -> Widget ()
+drawHelp game =
+  [ "Current Player:  Player "      <> show (player game)
+  , "Current Color :  "             <> if (player game) == 0 then "White" else "Black"
+  , "==========================================="
+  , "Move Cursor   :  ←↓↑→ / wasd"
+  , "Place a piece :  `Space`"
   , ""
-  , "Rest Game:   ctrl + r"
-  , "Quit Game:    ctrl + c"
+  , "Rest Game     :  r"
+  , "Quit Game     :  c"
   ]
   & unlines
   & str
@@ -135,21 +136,6 @@ drawDebug game =
   & hLimit 31
   where (x, y) = cursor game
 
-drawSolved :: Game -> Widget ()
-drawSolved game
-  | completed && solved =
-    str "SOLVED" & withAttr styleSolved & commonModifier
-  | completed && not solved =
-    str "INCORRECT" & withAttr styleUnsolved & commonModifier
-  | otherwise = emptyWidget
-  where
-    completed = gameProgress game == 100
-    solved    = gameSolved game
-    commonModifier
-      = setAvailableSize (31, 3)
-      . withBorderStyle unicodeBold
-      . border
-      . center
 
 drawUI :: Game -> [Widget ()]
 drawUI game =
@@ -158,16 +144,17 @@ drawUI game =
       (withBorderStyle unicodeBold
       . withBorderStyle unicodeRounded
       . borderWithLabel (str " Winner ")
-      . border) $ str ("\n\n          Player " <> (show winner) <> " wins!          \n\n")
+      . border) $ str ("\n\n                 Player " <> (show winner) <> " wins!          \n\n\n       Press `r` to reset or `c` to exit       \n")
     , drawUIMain game]
     else [drawUIMain game]
     where winner = if (player game) == 0 then 1 else 0
 
 drawUIMain :: Game -> Widget ()
 drawUIMain game =
-  drawGrid game <+> ( drawHelp
-                -- <=>   drawDebug game
-                    )
+    ( drawHelp game
+    -- <=>   drawDebug game
+    )
+    <+>                drawGrid game 
 
 app :: App Game e ()
 app = App
@@ -178,27 +165,11 @@ app = App
   , appAttrMap      = const attributes
   }
 
-main :: IO ()
+main :: IO Game
 main = do
   do
-      endGame <- defaultMain app (mkGame demo)
-      saveGame "autosave.gomoku" endGame
-
--- main :: IO ()
--- main = do
---   putStr $ unlines
---     [ "GOMOKU"
---     , "  1: Enter 1 to play GOMOKU! "
---     , "  Otherwise: Press any character to quit the demo"
---     ]
---   response <- prompt "> "
---   case head' response of
---     '1' -> do
---       endGame <- defaultMain app (mkGame demo)
---       saveGame "autosave.gomoku" endGame
---     _   -> putStrLn "Quitting..."
---   where head' [] = ' '
---         head' x  = head x
+      defaultMain app (mkGame demo)
+      
 
 demo :: [Int]
 demo = let z = 0 in

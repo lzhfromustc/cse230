@@ -11,7 +11,6 @@ module Game
   , answerCell
   , snapshotGame
   , resetGame
-  , gameProgress
   , gameSolved
   , getRegion
     
@@ -39,6 +38,7 @@ data Game = Game
   , player :: Int
   , grid :: Grid
   , previous :: Maybe Game
+  , end :: Bool
   } deriving (Read, Show)
 
 data Direction
@@ -54,6 +54,7 @@ mkGame xs = Game
   , player = 0
   , grid = chunksOf 9 $ mkCell <$> xs
   , previous = Nothing
+  , end = False
   }
   where mkCell 0 = Empty
         mkCell n = Given n
@@ -94,7 +95,9 @@ transformCell f game = game { grid = grid game & ix y . ix x %~ f }
 
 
 answerCell :: Int -> Game -> Game
-answerCell number game = transformCell (\case
+answerCell number game = if (gameSolved game) 
+  then game {end = True}
+  else transformCell (\case
   Input n -> Input n
   Empty   -> Input number
   _       -> undefined) (maySwitchPlayer game)
@@ -107,21 +110,11 @@ snapshotGame game
         lastGrid    = grid <$> previous game
 
 resetGame :: Game -> Game
-resetGame game = game { grid = fmap (fmap f) (grid game), player = 0 }
+resetGame game = game { grid = fmap (fmap f) (grid game), player = 0, end = False }
   where f = \case
           Given n -> Given n
           _       -> Empty
 
-gameProgress :: Game -> Int
-gameProgress game = round ((completed / total :: Float) * 100)
-  where
-    cells     = concat $ grid game
-    completed = fromIntegral $ length $ filter hasValue cells
-    total     = fromIntegral $ length cells
-    hasValue  = \case
-      Given _ -> True
-      Input _ -> True
-      _       -> False
 
 gameSolved :: Game -> Bool
 gameSolved game = rowsSolved || columnsSolved || diagonalSolved

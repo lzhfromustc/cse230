@@ -1,30 +1,3 @@
--- name:                gomoku
--- version:             TODO
--- homepage:            https://github.com/lzhfromustc/cse230
--- license:             TODO
--- license-file:        TODO
--- author:              Nitya Davarapalli, Ziheng Liu
--- maintainer:          ndavarapalli@ucsd.edu, zil060@ucsd.edu
--- copyright:           TODO
--- category:            TODO
--- build-type:          Simple
--- cabal-version:       >=1.10
--- extra-source-files:  README.md
-
--- executable gomoku
---   hs-source-dirs:      src
---   other-modules:       Gomoku
---   main-is:             Main.hs
---   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
---   default-language:    Haskell2010
---   build-depends:       base         >= 4.7 && < 5
---                      , brick
---                      , containers
---                      , extra
---                      , linear
---                      , lens
---                      , transformers
---                      , vty
 
 name:                gomoku
 version:             0.1.0.0
@@ -44,7 +17,6 @@ executable gomoku
   hs-source-dirs:      src
   other-modules:       Game
                      , UI
-                     , FileIO
   main-is:             Main.hs
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N -fforce-recomp
   default-language:    Haskell2010
