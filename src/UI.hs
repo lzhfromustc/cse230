@@ -133,9 +133,9 @@ drawGrid game =
   & fmap (fmap (fmap hBox))
   & fmap (fmap (intersperse (withBorderStyle unicode (hBorderWithLabel (str "─┼───────┼─")))))
   & fmap (fmap vBox)
-  & fmap (intersperse (withBorderStyle unicodeBold vBorder))
+  & fmap (intersperse (withBorderStyle unicode vBorder))
   & fmap hBox
-  & intersperse (withBorderStyle unicodeBold (hBorderWithLabel (str "╋━━━━━━━━━━━━━━━━━━━━━━━╋")))
+  & intersperse (withBorderStyle unicode (hBorderWithLabel (str "┼───────────────────────┼")))
   & vBox
   & border
   & withBorderStyle unicodeBold
@@ -218,19 +218,25 @@ app = App
 
 main :: IO ()
 main = do
-  putStr $ unlines
-    [ "GOMOKU"
-    , "  1: Enter 1 to play GOMOKU! "
-    , "  Otherwise: Press any character to quit the demo"
-    ]
-  response <- prompt "> "
-  case head' response of
-    '1' -> do
+  do
       endGame <- defaultMain app (mkGame demo)
       saveGame "autosave.gomoku" endGame
-    _   -> putStrLn "Quitting..."
-  where head' [] = ' '
-        head' x  = head x
+
+-- main :: IO ()
+-- main = do
+--   putStr $ unlines
+--     [ "GOMOKU"
+--     , "  1: Enter 1 to play GOMOKU! "
+--     , "  Otherwise: Press any character to quit the demo"
+--     ]
+--   response <- prompt "> "
+--   case head' response of
+--     '1' -> do
+--       endGame <- defaultMain app (mkGame demo)
+--       saveGame "autosave.gomoku" endGame
+--     _   -> putStrLn "Quitting..."
+--   where head' [] = ' '
+--         head' x  = head x
 
 demo :: [Int]
 demo = let z = 0 in
