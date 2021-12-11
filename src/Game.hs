@@ -16,12 +16,14 @@ module Game
   , gameProgress
   , gameSolved
   , getRegion
+    
   ) where
 
 import Data.Function ((&))
 import Data.List (isInfixOf)
 import Data.List.Split (chunksOf)
 import Lens.Micro (ix, (%~), (^?))
+
 
 data Cell
   = Given Int
